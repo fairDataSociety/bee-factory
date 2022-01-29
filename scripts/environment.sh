@@ -17,16 +17,20 @@ PARAMETERS:
                                 3. 21633:21635 (...)
                                 number represents the nodes number to map from. Default is 2.
     --hostname=string           Interface to which should the nodes be bound (default 127.0.0.0).
+    --fairos                    FairOS instance will be added to the environment
+    --fairos-stamp=string       Used Postage Stamp ID for FairOS
 USAGE
     exit 1
 }
 
 
 stop() {
-    #Stop Bee nodes
-    docker stop "$SWARM_BLOCKCHAIN_NAME"
     #Stop blockchain nodes
+    docker stop "$SWARM_BLOCKCHAIN_NAME"
+    #Stop bee nodes
     "$MY_PATH/bee.sh" stop
+    #Stop fairOS node
+    "$MY_PATH/fairos.sh" stop
 
     trap - SIGINT
     exit 0;
@@ -42,6 +46,7 @@ BLOCKCHAIN_VERSION=$("$MY_PATH/utils/env-variable-value.sh" BLOCKCHAIN_VERSION)
 # Init variables
 EPHEMERAL=false
 RESTRICTED=false
+FAIROS_ENABLED=false
 RESTRICTED_PASSWORD="SwarmToTheMoon"
 WORKERS=4
 LOG=true
@@ -83,6 +88,14 @@ do
         ;;
         --detach)
         LOG=false
+        shift 1
+        ;;
+        --fairos)
+        FAIROS_ENABLED=true
+        shift 1
+        ;;
+        --fairos-stamp=*)
+        FAIROS_STAMP="${1#*=}"
         shift 1
         ;;
         --hostname=*)
@@ -138,7 +151,7 @@ fi
 if $RESTRICTED ; then
     BEE_SH_ARGUMENTS="$BEE_SH_ARGUMENTS --restrict=$RESTRICTED_PASSWORD"
 fi
-if ! $LOG ; then
+if ! $LOG || $FAIROS_ENABLED ; then
     BEE_SH_ARGUMENTS="$BEE_SH_ARGUMENTS --detach"
 fi
 
@@ -146,8 +159,22 @@ fi
 echo "Start Bee nodes..."
 "$MY_PATH/bee.sh" start $BEE_SH_ARGUMENTS
 
+if $FAIROS_ENABLED ; then
+    FAIROS_SH_PARAMS="--hostname=$HOSTNAME"
+    if [ -n "$FAIROS_STAMP" ] ; then
+        FAIROS_SH_PARAMS="$FAIROS_SH_PARAMS --stamp $FAIROS_STAMP"
+    fi
+    if ! $LOG ; then
+        FAIROS_SH_PARAMS="$FAIROS_SH_PARAMS --detach"
+    fi
+    if $EPHEMERAL ; then
+        FAIROS_SH_PARAMS="$FAIROS_SH_PARAMS --ephemeral"
+    fi
+    "$MY_PATH/fairos.sh" start $FAIROS_SH_PARAMS
+fi
+
 # If the code run reach this point without detach flag,
 # then the user interrupted the log process in the bee.sh
 if $LOG ; then
-    docker stop $SWARM_BLOCKCHAIN_NAME
+    stop
 fi
