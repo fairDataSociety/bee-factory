@@ -135,15 +135,15 @@ if [ -z "$QUEEN_CONTAINER_IN_DOCKER" ] ; then
     exit 1
 fi
 
-if [ -z "$STAMP" ] ; then
-    echo "Buying stamp on the Queen node..."
-    STAMP=$(buy_postage)
-    echo "Bought stamp ID: $STAMP"
-    echo "Waiting 11 secs until postage stamp is usable..."
-    sleep 11
-fi
-
 if [ -z "$FAIROS_CONTAINER_IN_DOCKER" ] || $EPHEMERAL ; then
+    if [ -z "$STAMP" ] ; then
+        echo "Buying stamp on the Queen node..."
+        STAMP=$(buy_postage)
+        echo "Bought stamp ID: $STAMP"
+        echo "Waiting 11 secs until postage stamp is usable..."
+        sleep 11
+    fi
+
     EXTRA_FAIROS_PARAMS="-p $HOSTNAME:9090:9090"
     docker run \
       -d \
