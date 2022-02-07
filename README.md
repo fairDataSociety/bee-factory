@@ -86,6 +86,14 @@ start the Bee cluster
 ./scripts/environment.sh start
 ```
 
+### FairOS support
+
+You can easily spin up a FairOS node with passing `--fairos` flag to the environment script
+
+```sh
+./scripts/environment.sh start --fairos
+```
+
 ### Restricted API
 
 If you want to enable permission check feature of Bee on the API endpoints you can use `--restrict` flag. This will
