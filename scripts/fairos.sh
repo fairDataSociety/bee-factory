@@ -53,6 +53,7 @@ MY_PATH=$( cd "$MY_PATH" && pwd )  # absolutized and normalized
 FAIROS_VERSION=$("$MY_PATH/utils/env-variable-value.sh" FAIROS_VERSION)
 FAIROS_IMAGE_NAME=$("$MY_PATH/utils/env-variable-value.sh" FAIROS_IMAGE_NAME)
 BEE_ENV_PREFIX=$("$MY_PATH/utils/env-variable-value.sh" BEE_ENV_PREFIX)
+POSTAGE_BUYING_WAITING_TIME=$("$MY_PATH/utils/env-variable-value.sh" POSTAGE_BUYING_WAITING_TIME)
 
 # Init variables
 EPHEMERAL=false
@@ -140,8 +141,8 @@ if [ -z "$FAIROS_CONTAINER_IN_DOCKER" ] || $EPHEMERAL ; then
         echo "Buying stamp on the Queen node..."
         STAMP=$(buy_postage)
         echo "Bought stamp ID: $STAMP"
-        echo "Waiting 11 secs until postage stamp is usable..."
-        sleep 11
+        echo "Waiting $POSTAGE_BUYING_WAITING_TIME secs until postage stamp is usable..."
+        sleep $POSTAGE_BUYING_WAITING_TIME
     fi
 
     EXTRA_FAIROS_PARAMS="-p $HOSTNAME:9090:9090"
