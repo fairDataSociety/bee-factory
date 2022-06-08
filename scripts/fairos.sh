@@ -43,7 +43,7 @@ log_container() {
 }
 
 buy_postage() {
-    POSTAGE=$(curl -s -XPOST "http://localhost:1635/stamps/10000/20" | python -c 'import json,sys; obj=json.load(sys.stdin); print(obj["batchID"]);')
+    POSTAGE=$(curl -s -XPOST "http://localhost:1635/stamps/10000/20" | python3 -c 'import json,sys; obj=json.load(sys.stdin); print(obj["batchID"]);')
     echo "$POSTAGE"
 }
 
