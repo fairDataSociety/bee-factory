@@ -58,7 +58,7 @@ check_queen_is_running() {
 }
 
 get_token() {
-  echo "$(curl -X POST -s "http://$HOSTNAME:1633/auth" -u "_:$1" -d '{"role":"maintainer","expiry":400}' | python -c 'import json,sys; obj=json.load(sys.stdin); print(obj["key"]);')"
+  echo "$(curl -X POST -s "http://$HOSTNAME:1633/auth" -u "_:$1" -d '{"role":"maintainer","expiry":400}' | python3 -c 'import json,sys; obj=json.load(sys.stdin); print(obj["key"]);')"
 }
 
 fetch_queen_underlay_addr() {
@@ -69,7 +69,7 @@ fetch_queen_underlay_addr() {
     # Wait 2 mins for queen start
     TIMEOUT=$((2*12*WAITING_TIME))
     while (( TIMEOUT > ELAPSED_TIME )) ; do
-        QUEEN_UNDERLAY_ADDRESS=$(curl -s "$HOSTNAME:1635/addresses" | python -mjson.tool | grep "/ip4/" | awk "!/127.0.0.1/" | sed 's/,$//' | xargs)
+        QUEEN_UNDERLAY_ADDRESS=$(curl -s "$HOSTNAME:1635/addresses" | python3 -mjson.tool | grep "/ip4/" | awk "!/127.0.0.1/" | sed 's/,$//' | xargs)
         if [[ -z "$QUEEN_UNDERLAY_ADDRESS" ]] ; then
             echo "Waiting for the Queen initialization..."
             ELAPSED_TIME=$((ELAPSED_TIME+WAITING_TIME))
@@ -91,7 +91,7 @@ log_queen() {
 }
 
 count_connected_peers() {
-    COUNT=$( (curl -s "http://$HOSTNAME:1635/peers" -H "Authorization: Bearer $1" | python -c 'import json,sys; obj=json.load(sys.stdin); print (len(obj["peers"]));') || echo 0 )
+    COUNT=$( (curl -s "http://$HOSTNAME:1635/peers" -H "Authorization: Bearer $1" | python3 -c 'import json,sys; obj=json.load(sys.stdin); print (len(obj["peers"]));') || echo 0 )
 
     echo "$COUNT"
 }
